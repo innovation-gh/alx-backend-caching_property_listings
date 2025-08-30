@@ -2,7 +2,6 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.core.cache import cache
 from .models import Property
-from .utils import invalidate_property_cache
 import logging
 
 logger = logging.getLogger('cache_metrics')
@@ -18,7 +17,7 @@ def invalidate_property_cache_on_save(sender, instance, created, **kwargs):
     logger.info(f"Property {action}: {instance.title} (ID: {instance.id})")
     
     # Invalidate the all_properties cache
-    invalidate_property_cache()
+    cache.delete('all_properties')
     
     logger.info(f"Cache invalidated due to property {action}")
 
@@ -32,6 +31,6 @@ def invalidate_property_cache_on_delete(sender, instance, **kwargs):
     logger.info(f"Property deleted: {instance.title} (ID: {instance.id})")
     
     # Invalidate the all_properties cache
-    invalidate_property_cache()
+    cache.delete('all_properties')
     
     logger.info("Cache invalidated due to property deletion")
